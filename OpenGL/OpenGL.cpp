@@ -44,18 +44,20 @@ int main()
 
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
-	float vertices[] = {
-		0.5f, 0.5f, 0.0f,// 0 top right
-		0.5f, -0.5, 0.0f,// 1 bottom right
-	   -0.5f, -0.5f, 0.0f,// 2 bottom left
-	   -0.5f, 0.5f, 0.0f // 3 top left
+	float triangle1[] = {
+		// Triangle 1
+	   -0.9f, -0.5f, 0.0f,// left
+	   -0.7f, 0.0f, 0.0f,// top
+	   -0.5f, -0.5f, 0.0f,// right
+	};
+	float triangle2[] = {
+		// Triangle 2
+		0.5f, -0.5f, 0.0f, // left
+		0.7f, 0.0f, 0.0f, // top
+		0.9f, -0.5f, 0.0f // right
 	};
 
-	unsigned int indices[] = {
-		0, 1, 3, //first triangle
-		1, 2, 3 // second triangle
-	};
-
+	// Our vertex shader
 	const char* vertexShaderSource = "#version 460 core\n"
 		"layout (location =0) in vec3 aPos;\n"
 		"void main()\n"
@@ -74,9 +76,10 @@ int main()
 	if (!success)
 	{
 		glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED/n" << infoLog << "\n";
+		std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << "\n";
 	}
 
+	// Our Fragment shader
 	const char* fragmentShaderSource = "#version 460 core\n"
 		"out vec4 FragColor;\n"
 		"void main()\n"
@@ -102,25 +105,23 @@ int main()
 	if (!success) {
 		glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
 	}
+	// VAO AND VBO assignment
+	unsigned int VAO[2], VBO[2];
+	glGenVertexArrays(2, VAO);
+	glGenBuffers(2, VBO);
 
-	unsigned int VAO, VBO, EBO;
+	// VAO AND VBO for Triangle 1
+	glBindVertexArray(VAO[0]);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(triangle1), triangle1, GL_STATIC_DRAW);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float),
+		(void*)0);
+	glEnableVertexAttribArray(0);
 
-	glGenVertexArrays(1, &VAO);
-	glGenBuffers(1, &VBO);
-	glGenBuffers(1, &EBO);
-
-	//Bind Vertex Array Object
-	glBindVertexArray(VAO);
-
-	// copy our vertices array in a vertex buffer for OpenGL to use
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-	// copy our index array in a element buffer for OpenGL to use
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-	// set the vertex attributes pointers
+	// VAO AND VBO for Triangle 2
+	glBindVertexArray(VAO[1]);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO[1]);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(triangle2), triangle2, GL_STATIC_DRAW);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float),
 		(void*)0);
 	glEnableVertexAttribArray(0);
@@ -136,9 +137,12 @@ int main()
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		glUseProgram(shaderProgram);
-		glBindVertexArray(VAO);
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-		glBindVertexArray(0);
+
+		glBindVertexArray(VAO[0]);
+		glDrawArrays(GL_TRIANGLES, 0, 3);
+
+		glBindVertexArray(VAO[1]);
+		glDrawArrays(GL_TRIANGLES, 0, 3);
 
 
 		//check and call events and swap the buffers
