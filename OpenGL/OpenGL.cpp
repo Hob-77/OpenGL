@@ -158,10 +158,23 @@ int main()
         // Set the uniform
 		int offsetLocation = glGetUniformLocation(shaderProgram, "offset");
 		glUniform2f(offsetLocation, offsetX, 0.0f);
-
 		// Render the triangle
 		glBindVertexArray(VAO);
 		glDrawArrays(GL_TRIANGLES, 0, 3);
+
+		//Draw ghost copy if near the right edge
+		if (offsetX > 0.5f)
+		{
+			glUniform2f(offsetLocation, offsetX - 2.0f, 0.0f);
+			glDrawArrays(GL_TRIANGLES, 0, 3);
+		}
+
+		//Draw ghost copy if near left edge
+		if (offsetX < -0.5f)
+		{
+			glUniform2f(offsetLocation, offsetX + 2.0f, 0.0f);
+			glDrawArrays(GL_TRIANGLES, 0, 3);
+		}
 
 		//check and call events and swap the buffers
 		glfwPollEvents();
