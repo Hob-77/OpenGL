@@ -151,7 +151,9 @@
     <None Include="vertex_shader.vs" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="awesomeface.jpg" />
     <Image Include="container.jpg" />
+    <Image Include="recycle.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
