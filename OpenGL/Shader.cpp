@@ -100,4 +100,3 @@ Shader::Shader(const char* vertexPath, const char* fragmentPath)
 	{
 		glUniform1f(glGetUniformLocation(ID, name.c_str()), value);
 	}
-
